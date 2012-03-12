@@ -22,20 +22,48 @@ function focusq_save($item)
 		foreach($qPost as $right)
 			{
 				//echo $right;
+				$verifier	= find_item_and_q_combo($item->id, $x);
 				
-        		if (!$question)
+				if(!$question)
 				 	{
 	            	$question = new Question;
 	            	$question->item_id = $item->id;
 					$question->focus_q = $right;
        			 	}
-				//insert the quetion relationships
-				$data = array(
+					
+				if($verifier)
+					{
+					if($question->focus_q != "")
+						{
+						$mysql = 'UPDATE '. $db->prefix .'questions SET
+						focus_q = "'. $question->focus_q .'"
+							WHERE 
+								item_id = "'. $item->id .'" 
+								AND qorder_id = "'. $x .'"';
+						$db->query($mysql);	
+						}
+					else
+						{
+						$mysql = 'DELETE FROM '. $db->prefix .'questions
+							WHERE 
+								item_id = "'. $item->id .'" 
+								AND qorder_id = "'. $x .'"';
+						$db->query($mysql);	
+							
+						}
+					}
+				else 
+					{
+					//insert the quetion relationships
+					$data = array(
 					'item_id'	=> $question->item_id,
 					'focus_q' => $question->focus_q,
 					'qorder_id' => $x
 					);
-				$db->insert('questions', $data);
+					$db->insert('questions', $data);
+					}
+
+				//$db->insert('questions', $data);
 				unset($question);
 				$x++;
 				}
@@ -60,7 +88,7 @@ function focusq_form($item, $post = null) {
 		for($x=1; $x<=$numberofqs; $x++)
 			{
 			$row	=	find_item_and_q_combo($item->id, $x);
-			?>
+				?>
 			 <input type="text" id="question[<?php echo $x; ?>]"  name="question[<?php echo $x; ?>]" value="<?php echo $row[focus_q]; ?>" />
 			<?php	
 			}
@@ -75,7 +103,11 @@ function find_item_and_q_combo($itemid, $questionum)
 {
 		$db = get_db();
 		//insert the quetion relationships
-		$findrow	= $db->fetchRow('SELECT focus_q FROM '. $db->prefix .'questions WHERE item_id = "'. $itemId .'" AND focus_q = "'. $questionum .'"');	
+		$mysql = 'SELECT focus_q FROM '. $db->prefix .'questions WHERE item_id = "'. $itemid .'" AND qorder_id = "'. $questionum .'"';
+		$findrow	= $db->fetchRow($mysql);	
+		//echo $findrow[focus_q];//debug
+		//echo "$itemid is the item id and $questionum is the num";//debug
+		//echo "$mysql";//debug
 		return $findrow;
 }
 
