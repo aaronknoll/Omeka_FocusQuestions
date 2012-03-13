@@ -2,7 +2,7 @@
 
 add_plugin_hook('install', 'install');
 add_plugin_hook('uninstall', 'uninstall');
-add_filter('admin_navigation_main', 'FocusAddToNav');
+//add_filter('admin_navigation_main', 'FocusAddToNav');
 add_plugin_hook('config_form', 'focusq_config_form');
 add_plugin_hook('config', 'focusq_config');
 add_filter('admin_items_form_tabs', 'focusq_item_form_tabs');
@@ -82,14 +82,21 @@ function focusq_form($item, $post = null) {
 		
 		$numberofqs	=	get_option('focusq_per_page');
 	
+		
 		?>
+		<p>Enter one Question in each box. You can change the 
+			number of boxes which appear here on
+			the Questions' configuration page. </p>
+			<p>To delete a question, delete the text from the box and 
+				click save.</p>
 		<div id="questionform">
 		<?php
 		for($x=1; $x<=$numberofqs; $x++)
 			{
 			$row	=	find_item_and_q_combo($item->id, $x);
 				?>
-			 <input type="text" id="question[<?php echo $x; ?>]"  name="question[<?php echo $x; ?>]" value="<?php echo $row[focus_q]; ?>" />
+			 <textarea rows="3" cols="75" id="question[<?php echo $x; ?>]"  name="question[<?php echo $x; ?>]" value="<?php echo $row[focus_q]; ?>" />
+			 </textarea>
 			<?php	
 			}
 		?>
@@ -165,8 +172,8 @@ function focusq_item_form_tabs($tabs)
 	
 	function FocusAddToNav($nav)
     {
-        $nav['Questions'] = uri('focus-q');
-        return $nav;
+       //$nav['Questions'] = uri('focus-q');
+       return $nav;
     }
     
 
